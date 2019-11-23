@@ -15,6 +15,7 @@ patchesStrategicMerge:
 
 configMapGenerator:
 - name: pipeline-aws-parameters
+  behavior: merge
   env: params.env
 
 generatorOptions:
