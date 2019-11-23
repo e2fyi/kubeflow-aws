@@ -43,34 +43,6 @@ vars:
     apiVersion: v1
   fieldref:
     fieldpath: data.awsSecretKeySecretKey
-- name: awsRegion
-  objref:
-    kind: ConfigMap
-    name: pipeline-aws-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.awsRegion
-- name: executorImage
-  objref:
-    kind: ConfigMap
-    name: pipeline-aws-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.executorImage
-- name: artifactRepositoryBucket
-  objref:
-    kind: ConfigMap
-    name: pipeline-aws-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.artifactRepositoryBucket
-- name: artifactRepositoryKeyPrefix
-  objref:
-    kind: ConfigMap
-    name: pipeline-aws-parameters
-    apiVersion: v1
-  fieldref:
-    fieldpath: data.artifactRepositoryKeyPrefix
 
 configurations:
 - params.yaml
