@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: mysql
+          env:
+            - name: MYSQL_DATABASES
+              value: "$(pipelineMysqlDb),$(metadataMysqlDb)"
+            - name: MYSQL_ROOT_PASSWORD
+              secretKeyRef:
+                name: mysql-secrets
+                key: root_password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+          image: mysql:5.6
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-persistent-storage
+            - name: docker-entrypoint
+              mountPath: /usr/local/bin/
+      volumes:
+        - name: docker-entrypoint
+          configMap:
+            name: mysql-configs
+            items:
+              - key: docker-entrypoint.sh
+                path: docker-entrypoint.sh
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: $(mysqlPvcName)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mysql
+  name: $(mysqlHost)
+spec:
+  ports:
+    - port: 3306
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: mysql
+  name: $(mysqlPvcName)
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: $(mysqlStorageSize)
+  storageClassName: $(mysqlStorageClass)
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  labels:
+    app: mysql
+  name: $(mysqlStorageClass)
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: $(mysqlStorageClass)

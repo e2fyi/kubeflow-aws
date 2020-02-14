@@ -2,11 +2,41 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-  - github.com/kubeflow/pipelines//manifests/kustomize/base?ref=0.1.35
-  - mysql
+  # references the individual components instead of the base because we want
+  # to leave out the inverting reverse proxy agent component which expose kfp to
+  # google datalab
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/application?ref=0.2.3
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/argo?ref=0.2.3
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/crds?ref=0.2.3
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/metadata?ref=0.2.3
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/pipeline?ref=0.2.3
 
 resources:
-  - viewer-tensorboard-template-configmap.yaml
+  # registers this as a kubeflow application
+  - manifest/pipeline-application.yaml
+  # use a custom podTemplate definition for tensorboard viewer
+  # -> points tensorflow logs to a S3 endpoint
+  - manifest/viewer-tensorboard-template-configmap.yaml
+  # this configmap overwrites the default configs for ml-pipeline api server
+  - manifest/ml-pipeline-apiserver-configmap.yaml
+  # mysql database used by ml-pipeline api server and metadata server
+  - manifest/mysql.yaml
+
+images:
+- name: gcr.io/ml-pipeline/api-server
+  newTag: 0.2.3
+- name: gcr.io/ml-pipeline/persistenceagent
+  newTag: 0.2.3
+- name: gcr.io/ml-pipeline/scheduledworkflow
+  newTag: 0.2.3
+- name: gcr.io/ml-pipeline/frontend
+  newTag: 0.2.3
+- name: gcr.io/ml-pipeline/viewer-crd-controller
+  newTag: 0.2.3
+- name: gcr.io/ml-pipeline/visualization-server
+  newTag: 0.2.3
+- name: gcr.io/ml-pipeline/metadata-writer
+  newTag: 0.2.3
 
 # Replace with your namespace
 namespace: kubeflow
@@ -15,8 +45,19 @@ patchesStrategicMerge:
   - aws-configurations-patch.yaml
 
 configMapGenerator:
+  # This configmap is not actually used, but is used to sync the kustomize vars
   - name: pipeline-aws-parameters
-    env: params.env
+    env: params.env    # All parameters can be set inside this file
+  # Modified docker entrypoint so that multiple databases can be created on
+  # startup (pipeline db and metadata db)
+  - name: mysql-configs
+    files:
+      - assets/docker-entrypoint.sh
+
+secretGenerator:
+  # Please update the secret here
+  - name: mysql-secrets
+    env: mysql-secrets.env
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -50,6 +91,62 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.artifactRepositoryKeyPrefix
+  - name: pipelineBucket
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.pipelineBucket
+  - name: pipelinePath
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.pipelinePath
+  - name: pipelineMysqlDb
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.pipelineMysqlDb
+  - name: metadataMysqlDb
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.metadataMysqlDb
+  - name: mysqlHost
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.mysqlHost
+  - name: mysqlPvcName
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.mysqlPvcName
+  - name: mysqlStorageClass
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.mysqlStorageClass
+  - name: mysqlStorageSize
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.mysqlStorageSize
 
 configurations:
   - params.yaml

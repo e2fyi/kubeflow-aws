@@ -11,5 +11,19 @@ varReference:
   kind: Deployment
 - path: spec/template/metadata/annotations
   kind: Deployment
+- path: spec/template/spec/volumes/persistentVolumeClaim/claimName
+  kind: Deployment
 - path: data
   kind: ConfigMap
+- path: spec/storageClassName
+  kind: PersistentVolumeClaim
+- path: spec/resources/requests/storage
+  kind: PersistentVolumeClaim
+- path: metadata/name
+  kind: PersistentVolumeClaim
+- path: metadata/name
+  kind: StorageClass
+- path: parameters/type
+  kind: StorageClass
+- path: metadata/name
+  kind: Service
