@@ -38,9 +38,6 @@ images:
 - name: gcr.io/ml-pipeline/metadata-writer
   newTag: 0.2.3
 
-# Replace with your namespace
-namespace: kubeflow
-
 patchesStrategicMerge:
   - aws-configurations-patch.yaml
 
