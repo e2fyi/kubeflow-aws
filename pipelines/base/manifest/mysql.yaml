@@ -14,6 +14,8 @@ spec:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+      labels:
+        app: mysql
     spec:
       containers:
         - name: mysql
@@ -21,9 +23,10 @@ spec:
             - name: MYSQL_DATABASES
               value: "$(pipelineMysqlDb),$(metadataMysqlDb)"
             - name: MYSQL_ROOT_PASSWORD
-              secretKeyRef:
-                name: mysql-secrets
-                key: root_password
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: root_password
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
