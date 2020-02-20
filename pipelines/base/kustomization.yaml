@@ -76,6 +76,13 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.awsRegion
+  - name: workflowControllerImage
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.workflowControllerImage
   - name: executorImage
     objref:
       kind: ConfigMap
