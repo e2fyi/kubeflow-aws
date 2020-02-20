@@ -1,9 +1,9 @@
 # Kubeflow Pipelines
 
-[![0.2.3](https://img.shields.io/badge/kubeflow--pipelines-0.2.3-blue.svg)](https://github.com/kubeflow/pipelines/commit/881cde2be1da9985c209d46c6bb3857f8b6e03e4)
+[![0.2.4](https://img.shields.io/badge/kubeflow--pipelines-0.2.4-blue.svg)](https://github.com/kubeflow/pipelines/tree/74a8178e1d68ad3dad28084673ab74605e0e735d)
 
 [Kubeflow pipelines (kfp)](https://github.com/kubeflow/pipelines) are reusable end-to-end ML workflows.
-As of release `0.2.3`, kfp comprises of the following components:
+As of release `0.2.4`, kfp comprises of the following components:
 
 | service                                                    | description                                                                                                                                                                                                    |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -86,8 +86,8 @@ kubctl delete -f kubeflow-crds.yaml
 
 `crds` folder references the crds manifest in the kubeflow pipelines repo so they can be deployed
 separately. The reason for this is `crd` is cluster resource and shared by multiple namespaces.
-If they are merged as a single `kustomize` deployment, it will potentially affect other 
-deployments when we destroy. This is to help users that want to deploy multiple kubeflow pipelines 
+If they are merged as a single `kustomize` deployment, it will potentially affect other
+deployments when we destroy. This is to help users that want to deploy multiple kubeflow pipelines
 in different namespaces.
 
 `base` folder references the light-weight pipeline manifest in the kubeflow

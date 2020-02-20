@@ -21,6 +21,7 @@ metadata:
 data:
   config: |
     {
+    namespace: $(namespace),
     executorImage: $(executorImage),
     artifactRepository:
     {
@@ -54,6 +55,12 @@ spec:
               value: $(artifactRepositoryKeyPrefix)
             - name: VIEWER_TENSORBOARD_POD_TEMPLATE_SPEC_PATH
               value: /etc/config/viewer-tensorboard-template.json
+            - name: METADATA_ENVOY_SERVICE_SERVICE_HOST
+              value: metadata-envoy-service
+            - name: ML_PIPELINE_SERVICE_HOST
+              value: ml-pipeline
+            - name: DISABLE_GKE_METADATA
+              value: "true"
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config

@@ -5,10 +5,10 @@ bases:
   # references the individual components instead of the base because we want
   # to leave out the inverting reverse proxy agent, crds component which expose kfp to
   # google datalab
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/application?ref=0.2.3
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/argo?ref=0.2.3
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/metadata?ref=0.2.3
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/pipeline?ref=0.2.3
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/application?ref=0.2.4
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/argo?ref=0.2.4
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/metadata?ref=0.2.4
+  - github.com/kubeflow/pipelines//manifests/kustomize/base/pipeline?ref=0.2.4
 
 resources:
   # registers this as a kubeflow application
@@ -21,21 +21,23 @@ resources:
   # mysql database used by ml-pipeline api server and metadata server
   - manifest/mysql.yaml
 
+namespace: kubeflow
+
 images:
 - name: gcr.io/ml-pipeline/api-server
-  newTag: 0.2.3
+  newTag: 0.2.4
 - name: gcr.io/ml-pipeline/persistenceagent
-  newTag: 0.2.3
+  newTag: 0.2.4
 - name: gcr.io/ml-pipeline/scheduledworkflow
-  newTag: 0.2.3
+  newTag: 0.2.4
 - name: gcr.io/ml-pipeline/frontend
-  newTag: 0.2.3
+  newTag: 0.2.4
 - name: gcr.io/ml-pipeline/viewer-crd-controller
-  newTag: 0.2.3
+  newTag: 0.2.4
 - name: gcr.io/ml-pipeline/visualization-server
-  newTag: 0.2.3
+  newTag: 0.2.4
 - name: gcr.io/ml-pipeline/metadata-writer
-  newTag: 0.2.3
+  newTag: 0.2.4
 
 patchesStrategicMerge:
   - aws-configurations-patch.yaml
@@ -60,6 +62,13 @@ generatorOptions:
   disableNameSuffixHash: true
 
 vars:
+  - name: namespace
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.namespace
   - name: awsRegion
     objref:
       kind: ConfigMap
