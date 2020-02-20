@@ -45,11 +45,13 @@ spec:
             - mountPath: /var/lib/mysql
               name: mysql-persistent-storage
             - name: docker-entrypoint
-              mountPath: /usr/local/bin/
+              mountPath: /usr/local/bin/docker-entrypoint.sh
+              subPath: docker-entrypoint.sh # overwrite single file
       volumes:
         - name: docker-entrypoint
           configMap:
             name: mysql-configs
+            defaultMode: 0777 # need to make file executable
             items:
               - key: docker-entrypoint.sh
                 path: docker-entrypoint.sh
@@ -64,6 +66,8 @@ metadata:
     app: mysql
   name: $(mysqlHost)
 spec:
+  selector:
+    app: mysql
   ports:
     - port: 3306
 ---
@@ -89,4 +93,4 @@ metadata:
   name: $(mysqlStorageClass)
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: $(mysqlStorageClass)
+  type: $(mysqlStorageType)

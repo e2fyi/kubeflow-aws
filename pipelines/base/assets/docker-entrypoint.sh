@@ -61,6 +61,7 @@ docker_process_init_files() {
 			*.sh)     mysql_note "$0: running $f"; . "$f" ;;
 			*.sql)    mysql_note "$0: running $f"; docker_process_sql < "$f"; echo ;;
 			*.sql.gz) mysql_note "$0: running $f"; gunzip -c "$f" | docker_process_sql; echo ;;
+			*.sql.xz) mysql_note "$0: running $f"; xzcat "$f" | docker_process_sql; echo ;;
 			*)        mysql_warn "$0: ignoring $f" ;;
 		esac
 		echo
@@ -234,6 +235,7 @@ docker_setup_db() {
 		read -r -d '' passwordSet <<-EOSQL || true
 			DELETE FROM mysql.user WHERE user NOT IN ('mysql.sys', 'mysqlxsys', 'root') OR host NOT IN ('localhost') ;
 			SET PASSWORD FOR 'root'@'localhost'=PASSWORD('${MYSQL_ROOT_PASSWORD}') ;
+
 			-- 5.5: https://github.com/mysql/mysql-server/blob/e48d775c6f066add457fa8cfb2ebc4d5ff0c7613/scripts/mysql_secure_installation.sh#L192-L210
 			-- 5.6: https://github.com/mysql/mysql-server/blob/06bc670db0c0e45b3ea11409382a5c315961f682/scripts/mysql_secure_installation.sh#L218-L236
 			-- 5.7: https://github.com/mysql/mysql-server/blob/913071c0b16cc03e703308250d795bc381627e37/client/mysql_secure_installation.cc#L792-L818
@@ -253,6 +255,7 @@ docker_setup_db() {
 		-- What's done in this file shouldn't be replicated
 		--  or products like mysql-fabric won't work
 		SET @@SESSION.SQL_LOG_BIN=0;
+
 		${passwordSet}
 		GRANT ALL ON *.* TO 'root'@'localhost' WITH GRANT OPTION ;
 		FLUSH PRIVILEGES ;
@@ -266,13 +269,14 @@ docker_setup_db() {
 		docker_process_sql --database=mysql <<<"CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;"
 	fi
 
-    if [ -n "$MYSQL_DATABASES" ]; then
-        local IFS=,
-        local DB_LIST=($1)
-        for database in "${DB_LIST[@]}"; do
-            mysql_note "Creating database ${database}"
-            docker_process_sql --database=mysql <<<"CREATE DATABASE IF NOT EXISTS \`$database\` ;"
-        done
+	if [ -n "$MYSQL_DATABASES" ]; then
+    mysql_note "Multiple databases detected: $MYSQL_DATABASES"
+    local IFS=,
+    local DB_LIST=($MYSQL_DATABASES)
+    for database in "${DB_LIST[@]}"; do
+      mysql_note "Creating database ${database}"
+      docker_process_sql --database=mysql <<<"CREATE DATABASE IF NOT EXISTS \`$database\` ;"
+    done
 	fi
 
 	if [ -n "$MYSQL_USER" ] && [ -n "$MYSQL_PASSWORD" ]; then
@@ -284,16 +288,17 @@ docker_setup_db() {
 			docker_process_sql --database=mysql <<<"GRANT ALL ON \`$MYSQL_DATABASE\`.* TO '$MYSQL_USER'@'%' ;"
 		fi
 
-        if [ -n "$MYSQL_DATABASES" ]; then
-            local IFS=,
-            local DB_LIST=($1)
-            for database in "${DB_LIST[@]}"; do
-                mysql_note "Giving user ${MYSQL_USER} access to schema ${database}"
-                docker_process_sql --database=mysql <<<"GRANT ALL ON \`$database\`.* TO '$MYSQL_USER'@'%' ;"
-            done
-        fi
+    if [ -n "$MYSQL_DATABASES" ]; then
+      local IFS=,
+      local DB_LIST=($MYSQL_DATABASES)
+      for database in "${DB_LIST[@]}"; do
+        mysql_note "Giving user ${MYSQL_USER} access to schema ${database}"
+        docker_process_sql --database=mysql <<<"GRANT ALL ON \`$database\`.* TO '$MYSQL_USER'@'%' ;"
+      done
+    fi
 
 		docker_process_sql --database=mysql <<<"FLUSH PRIVILEGES ;"
+		docker_process_sql --database=mysql <<<"SHOW GRANTS;"
 	fi
 }
 
