@@ -58,6 +58,8 @@ spec:
               value: metadata-envoy-service
             - name: ML_PIPELINE_SERVICE_HOST
               value: ml-pipeline
+            - name: DISABLE_GKE_METADATA
+              value: "true"
           volumeMounts:
             - name: config-volume
               mountPath: /etc/config
