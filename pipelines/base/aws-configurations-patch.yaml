@@ -92,6 +92,8 @@ spec:
           items:
             - key: config.json
               path: config.json
+            - key: sample_config.json
+              path: sample_config.json
 ---
 # metadata-config is retained for backward compatibility reasons.
 apiVersion: v1

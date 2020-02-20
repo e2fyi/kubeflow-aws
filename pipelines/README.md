@@ -48,6 +48,15 @@ kubectl kustomize overlay/iam
 
 To deploy:
 
+Create `kubeflow-pipelines` custom resource definitions (crd):
+```bash
+# generate crd yaml
+kubectl kustomize crds > kubeflow-crds.yaml
+# apply yaml
+kubectl apply -f kubeflow-crds.yaml
+```
+
+Deploy `kubeflow-pipelines`:
 ```bash
 # generate yaml
 kubectl kustomize overlay/${VARIANT} > kubeflow-pipelines-aws.yaml
@@ -59,7 +68,12 @@ To uninstall:
 
 ```bash
 # delete all k8s resources specified in yaml
-kubectl delete -f  kubeflow-pipelines-aws.yaml
+kubectl delete -f kubeflow-pipelines-aws.yaml
+```
+
+```bash
+# delete all k8s crds associated with kubeflow pipelines
+kubctl delete -f kubeflow-crds.yaml
 ```
 
 > ### IMPORTANT NOTE
@@ -69,6 +83,12 @@ kubectl delete -f  kubeflow-pipelines-aws.yaml
 > deployments in different namespaces.
 
 ## Folder structure
+
+`crds` folder references the crds manifest in the kubeflow pipelines repo so they can be deployed
+separately. The reason for this is `crd` is cluster resource and shared by multiple namespaces.
+If they are merged as a single `kustomize` deployment, it will potentially affect other 
+deployments when we destroy. This is to help users that want to deploy multiple kubeflow pipelines 
+in different namespaces.
 
 `base` folder references the light-weight pipeline manifest in the kubeflow
 pipelines repo, as well as a basic mysql manifest from the main kubeflow manifest
