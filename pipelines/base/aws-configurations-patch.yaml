@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: workflow-controller
-          image: $(executorImage)
+          image: $(workflowControllerImage)
           args:
             - --configmap
             - workflow-controller-configmap
