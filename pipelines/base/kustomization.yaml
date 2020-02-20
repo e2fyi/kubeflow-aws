@@ -21,6 +21,8 @@ resources:
   # mysql database used by ml-pipeline api server and metadata server
   - manifest/mysql.yaml
 
+namespace: kubeflow
+
 images:
 - name: gcr.io/ml-pipeline/api-server
   newTag: 0.2.3
@@ -60,6 +62,13 @@ generatorOptions:
   disableNameSuffixHash: true
 
 vars:
+  - name: namespace
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.namespace
   - name: awsRegion
     objref:
       kind: ConfigMap

@@ -21,6 +21,7 @@ metadata:
 data:
   config: |
     {
+    namespace: $(namespace),
     executorImage: $(executorImage),
     artifactRepository:
     {
