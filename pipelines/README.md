@@ -28,7 +28,7 @@ As of release `0.2.4`, kfp comprises of the following components:
 
 ```bash
 # generate the CRDs for kubeflow pipelines (first time only)
-kubectl kustomize base/crds > kubeflow-pipelines-crds.yaml
+kubectl kustomize crds > kubeflow-pipelines-crds.yaml
 # deploy the crds
 kubectl apply -f kubeflow-pipelines-crds.yaml
 # generate the provided overlay variant
