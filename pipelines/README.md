@@ -1,9 +1,9 @@
 # Kubeflow Pipelines
 
-[![0.2.4](https://img.shields.io/badge/kubeflow--pipelines-0.2.4-blue.svg)](https://github.com/kubeflow/pipelines/tree/74a8178e1d68ad3dad28084673ab74605e0e735d)
+[![0.3.0](https://img.shields.io/badge/kubeflow--pipelines-0.3.0-blue.svg)](https://github.com/kubeflow/pipelines/tree/0da0f8023898e0b11743cd7b6c31212781a64952)
 
 [Kubeflow pipelines (kfp)](https://github.com/kubeflow/pipelines) are reusable end-to-end ML workflows.
-As of release `0.2.4`, kfp comprises of the following components:
+As of release `0.3.0`, kfp comprises of the following components:
 
 | service                                                    | description                                                                                                                                                                                                    |
 | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
