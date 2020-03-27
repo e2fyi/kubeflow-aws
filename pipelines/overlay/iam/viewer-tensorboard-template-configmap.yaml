@@ -5,12 +5,12 @@ metadata:
 data:
   viewer-tensorboard-template.json: |
     {
+        "metadata": {
+            "annotations": {
+                "$(awsIAMAnnotationKey)": "$(awsIAMRole)"
+            }
+        },
         "spec": {
-            "metadata": {
-                "annotations": {
-                    "$(awsIAMAnnotationKey)": "$(awsIAMRole)"
-                }
-            },
             "containers": [
                 {
                     "env": [
