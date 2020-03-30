@@ -13,7 +13,7 @@ data:
         "DriverName": "mysql",
         "DataSourceName": "",
         "DBName": "$(pipelineMysqlDb)",
-        "GroupConcatMaxLen": "4194304"
+        "GroupConcatMaxLen": "$(groupConcatMaxLen)"
       },
       "ObjectStoreConfig": {
         "Host": "s3.amazonaws.com",

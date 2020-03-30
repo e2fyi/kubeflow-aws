@@ -167,6 +167,13 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.mysqlStorageSize
+  - name: groupConcatMaxLen
+    objref:
+      kind: ConfigMap
+      name: pipeline-aws-parameters
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.groupConcatMaxLen
 
 configurations:
   - params.yaml
