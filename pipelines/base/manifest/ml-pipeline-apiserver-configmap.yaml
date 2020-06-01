@@ -8,11 +8,11 @@ data:
   config.json: |
     {
       "DBConfig": {
-        "Host": "$(mysqlHost)",
+        "Host": "$(DBSERVICE_HOST)",
         "Port": "3306",
         "DriverName": "mysql",
         "DataSourceName": "",
-        "DBName": "$(pipelineMysqlDb)",
+        "DBName": "$(DBNAME_PIPELINE)",
         "GroupConcatMaxLen": "$(groupConcatMaxLen)"
       },
       "ObjectStoreConfig": {

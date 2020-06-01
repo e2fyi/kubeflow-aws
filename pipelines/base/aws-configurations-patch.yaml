@@ -1,19 +1,3 @@
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  name: workflow-controller
-spec:
-  template:
-    spec:
-      containers:
-        - name: workflow-controller
-          image: $(workflowControllerImage)
-          args:
-            - --configmap
-            - workflow-controller-configmap
-            - --executor-image
-            - $(executorImage)
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,8 +5,7 @@ metadata:
 data:
   config: |
     {
-    namespace: $(namespace),
-    executorImage: $(executorImage),
+    namespace: $(NAMESPACE),
     artifactRepository:
     {
         archiveLogs: true,
@@ -35,7 +18,7 @@ data:
     }
     }
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ml-pipeline-ui
@@ -69,7 +52,7 @@ spec:
           configMap:
             name: ml-pipeline-ui-viewer-template
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ml-pipeline
@@ -79,6 +62,10 @@ spec:
       containers:
         - name: ml-pipeline-api-server
           env:
+            - name: OBJECTSTORECONFIG_SECURE
+              value: "true"
+            - name: OBJECTSTORECONFIG_BUCKETNAME
+              value: $(pipelineBucket)
             - name: DBCONFIG_USER
               valueFrom:
                 secretKeyRef:
@@ -101,62 +88,3 @@ spec:
               path: config.json
             - key: sample_config.json
               path: sample_config.json
----
-# metadata-config is retained for backward compatibility reasons.
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: metadata-configmap
-  labels:
-    component: metadata-server
-data:
-  mysql_database: "$(metadataMysqlDb)"
-  mysql_host: "$(mysqlHost)"
-  mysql_port: "3306"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: metadata-mysql-configmap
-  labels:
-    component: metadata-server
-data:
-  MYSQL_DATABASE: "$(metadataMysqlDb)"
-  MYSQL_HOST: "$(mysqlHost)"
-  MYSQL_PORT: "3306"
----
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  name: metadata-deployment
-spec:
-  template:
-    spec:
-      containers:
-      - name: container
-        env:
-        - name: DBCONFIG_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: username
-        - name: DBCONFIG_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: password
-        - name: MYSQL_DATABASE
-          valueFrom:
-            configMapKeyRef:
-              name: metadata-mysql-configmap
-              key: MYSQL_DATABASE
-        - name: MYSQL_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: metadata-mysql-configmap
-              key: MYSQL_HOST
-        - name: MYSQL_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: metadata-mysql-configmap
-              key: MYSQL_PORT

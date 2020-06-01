@@ -2,17 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-  # references the individual components instead of the base because we want
-  # to leave out the inverting reverse proxy agent, crds component which expose kfp to
-  # google datalab
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/application?ref=0.3.0
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/argo?ref=0.3.0
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/metadata?ref=0.3.0
-  - github.com/kubeflow/pipelines//manifests/kustomize/base/pipeline?ref=0.3.0
+  - github.com/kubeflow/pipelines//manifests/kustomize/base?ref=0.5.1
 
 resources:
-  # registers this as a kubeflow application
-  - manifest/pipeline-application.yaml
   # use a custom podTemplate definition for tensorboard viewer
   # -> points tensorflow logs to a S3 endpoint
   - manifest/viewer-tensorboard-template-configmap.yaml
@@ -23,31 +15,17 @@ resources:
 
 namespace: kubeflow
 
-images:
-- name: gcr.io/ml-pipeline/api-server
-  newTag: 0.3.0
-- name: gcr.io/ml-pipeline/persistenceagent
-  newTag: 0.3.0
-- name: gcr.io/ml-pipeline/scheduledworkflow
-  newTag: 0.3.0
-- name: gcr.io/ml-pipeline/frontend
-  newTag: 0.3.0
-- name: gcr.io/ml-pipeline/viewer-crd-controller
-  newTag: 0.3.0
-- name: gcr.io/ml-pipeline/visualization-server
-  newTag: 0.3.0
-- name: gcr.io/ml-pipeline/metadata-writer
-  newTag: 0.3.0
-
 patchesStrategicMerge:
   - aws-configurations-patch.yaml
 
 configMapGenerator:
-  # This configmap is not actually used, but is used to sync the kustomize vars
+  # Note: pipeline-install-config is used by official kubeflow for installation parameters.
+  # See: https://github.com/kubeflow/pipelines/blob/0.5.1/manifests/kustomize/base/kustomization.yaml
+  # Create your own if you want to overwrite those parameters
   - name: pipeline-aws-parameters
     env: params.env    # All parameters can be set inside this file
   # Modified docker entrypoint so that multiple databases can be created on
-  # startup (pipeline db and metadata db)
+  # startup (pipeline db, metadata db, cache db)
   # Ref: https://github.com/docker-library/mysql/blob/master/5.6/docker-entrypoint.sh
   - name: mysql-configs
     files:
@@ -55,20 +33,14 @@ configMapGenerator:
 
 secretGenerator:
   # Please update the secret here
-  - name: mysql-secrets
+  - name: mysql-secret
+    behavior: replace
     env: mysql-secrets.env
 
 generatorOptions:
   disableNameSuffixHash: true
 
 vars:
-  - name: namespace
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: metadata.namespace
   - name: awsRegion
     objref:
       kind: ConfigMap
@@ -76,20 +48,6 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.awsRegion
-  - name: workflowControllerImage
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.workflowControllerImage
-  - name: executorImage
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.executorImage
   - name: artifactRepositoryBucket
     objref:
       kind: ConfigMap
@@ -118,27 +76,6 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.pipelinePath
-  - name: pipelineMysqlDb
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.pipelineMysqlDb
-  - name: metadataMysqlDb
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.metadataMysqlDb
-  - name: mysqlHost
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.mysqlHost
   - name: mysqlPvcName
     objref:
       kind: ConfigMap
