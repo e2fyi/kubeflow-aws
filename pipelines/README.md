@@ -56,10 +56,10 @@ To deploy:
 
 Create `kubeflow-pipelines` custom resource definitions (crd):
 ```bash
-# generate crd yaml
-kubectl kustomize crds > kubeflow-crds.yaml
+# generate cluster-scoped-resources yaml
+kubectl kustomize cluster-scoped-resources > kubeflow-csr.yaml
 # apply yaml
-kubectl apply -f kubeflow-crds.yaml
+kubectl apply -f kubeflow-csr.yaml
 ```
 
 Deploy `kubeflow-pipelines`:
@@ -78,8 +78,8 @@ kubectl delete -f kubeflow-pipelines-aws.yaml
 ```
 
 ```bash
-# delete all k8s crds associated with kubeflow pipelines
-kubctl delete -f kubeflow-crds.yaml
+# delete all k8s cluster-scoped-resources associated with kubeflow pipelines
+kubctl delete -f kubeflow-csr.yaml
 ```
 
 > ### IMPORTANT NOTE
@@ -90,9 +90,9 @@ kubctl delete -f kubeflow-crds.yaml
 
 ## Folder structure
 
-`crds` folder references the crds manifest in the kubeflow pipelines repo so they can be deployed
-separately. The reason for this is `crd` is cluster resource and shared by multiple namespaces.
-If they are merged as a single `kustomize` deployment, it will potentially affect other
+`cluster-scoped-resources` folder references the `cluster-scoped-resources` manifest in the kubeflow pipelines repo 
+so they can be deployed separately. The reason for this is `cluster-scoped-resources` is cluster resource and shared 
+by multiple namespaces. If they are merged as a single `kustomize` deployment, it will potentially affect other
 deployments when we destroy. This is to help users that want to deploy multiple kubeflow pipelines
 in different namespaces.
 
