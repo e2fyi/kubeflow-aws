@@ -27,7 +27,7 @@ data:
     }
     }
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ml-pipeline-ui
@@ -48,7 +48,7 @@ spec:
                   name: $(awsSecretName)
                   key: $(awsSecretKeySecretKey)
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ml-pipeline
