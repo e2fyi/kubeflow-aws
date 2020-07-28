@@ -62,13 +62,6 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.artifactRepositoryKeyPrefix
-  - name: pipelineBucket
-    objref:
-      kind: ConfigMap
-      name: pipeline-aws-parameters
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.pipelineBucket
   - name: pipelinePath
     objref:
       kind: ConfigMap
