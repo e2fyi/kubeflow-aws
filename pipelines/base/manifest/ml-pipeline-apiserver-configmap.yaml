@@ -8,20 +8,22 @@ data:
   config.json: |
     {
       "DBConfig": {
-        "Host": "$(DBSERVICE_HOST)",
+        "Host": "$(dbHost)",
         "Port": "3306",
         "DriverName": "mysql",
         "DataSourceName": "",
-        "DBName": "$(DBNAME_PIPELINE)",
+        "DBName": "$(pipelineDb)",
         "GroupConcatMaxLen": "$(groupConcatMaxLen)"
       },
       "ObjectStoreConfig": {
         "Host": "s3.amazonaws.com",
         "Region": "$(awsRegion)",
         "Secure": true,
-        "BucketName": "$(pipelineBucket)",
+        "BucketName": "$(artifactRepositoryBucket)",
         "PipelineFolder": "$(pipelinePath)",
-        "PipelinePath": "$(pipelinePath)"
+        "PipelinePath": "$(pipelinePath)",
+        "AccessKey": "",
+        "SecretAccessKey": ""
       },
       "InitConnectionTimeout": "6m",
       "DefaultPipelineRunnerServiceAccount": "pipeline-runner"

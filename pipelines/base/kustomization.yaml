@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 bases:
-  - github.com/kubeflow/pipelines//manifests/kustomize/base?ref=0.5.1
+  - github.com/kubeflow/pipelines/manifests/kustomize/base?ref=1.0.0
 
 resources:
   # use a custom podTemplate definition for tensorboard viewer
@@ -20,7 +20,7 @@ patchesStrategicMerge:
 
 configMapGenerator:
   # Note: pipeline-install-config is used by official kubeflow for installation parameters.
-  # See: https://github.com/kubeflow/pipelines/blob/0.5.1/manifests/kustomize/base/kustomization.yaml
+  # See: https://github.com/kubeflow/pipelines/blob/1.0.0/manifests/kustomize/base/kustomization.yaml
   # Create your own if you want to overwrite those parameters
   - name: pipeline-aws-parameters
     env: params.env    # All parameters can be set inside this file
@@ -111,6 +111,41 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: data.groupConcatMaxLen
+  - name: dbHost
+    objref:
+      kind: ConfigMap
+      name: pipeline-install-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.dbHost
+  - name: dbPort
+    objref:
+      kind: ConfigMap
+      name: pipeline-install-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.dbPort
+  - name: mlmdDb
+    objref:
+      kind: ConfigMap
+      name: pipeline-install-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.mlmdDb
+  - name: cacheDb
+    objref:
+      kind: ConfigMap
+      name: pipeline-install-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.cacheDb
+  - name: pipelineDb
+    objref:
+      kind: ConfigMap
+      name: pipeline-install-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.pipelineDb
 
 configurations:
   - params.yaml

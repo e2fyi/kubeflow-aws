@@ -5,7 +5,7 @@ metadata:
 data:
   config: |
     {
-    namespace: $(NAMESPACE),
+    namespace: $(namespace),
     artifactRepository:
     {
         archiveLogs: true,
@@ -62,10 +62,17 @@ spec:
       containers:
         - name: ml-pipeline-api-server
           env:
-            - name: OBJECTSTORECONFIG_SECURE
-              value: "true"
-            - name: OBJECTSTORECONFIG_BUCKETNAME
-              value: $(pipelineBucket)
+            # we do not use minio related access key options, delete these
+            # env vars as it interferes with config.json settings due to viper config
+            # management taking precedence of env vars over config.json
+            # currently, minio client will init a static client if access keys and secret
+            # are not empty.
+            - $patch: delete
+              name: OBJECTSTORECONFIG_ACCESSKEY
+            - $patch: delete
+              name: OBJECTSTORECONFIG_SECRETACCESSKEY
+            - $patch: delete
+              name: OBJECTSTORECONFIG_SECURE
             - name: DBCONFIG_USER
               valueFrom:
                 secretKeyRef:
