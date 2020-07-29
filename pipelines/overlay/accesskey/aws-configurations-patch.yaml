@@ -2,11 +2,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: workflow-controller-configmap
-  namespace: kubeflow
 data:
   config: |
     {
-    executorImage: $(executorImage),
+    namespace: $(kfp-namespace),
     artifactRepository:
     {
         archiveLogs: true,
@@ -14,6 +13,7 @@ data:
             bucket: $(artifactRepositoryBucket),
             keyPrefix: $(artifactRepositoryKeyPrefix),
             endpoint: s3.amazonaws.com,
+            region: $(awsRegion),
             insecure: false,
             accessKeySecret: {
                 name: $(awsSecretName),

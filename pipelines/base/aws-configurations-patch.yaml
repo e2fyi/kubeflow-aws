@@ -5,7 +5,7 @@ metadata:
 data:
   config: |
     {
-    namespace: $(namespace),
+    namespace: $(kfp-namespace),
     artifactRepository:
     {
         archiveLogs: true,
@@ -13,7 +13,7 @@ data:
             bucket: $(artifactRepositoryBucket),
             keyPrefix: $(artifactRepositoryKeyPrefix),
             endpoint: s3.amazonaws.com,
-            region: ap-southeast-1
+            region: $(awsRegion),
             insecure: false
         }
     }
@@ -68,6 +68,8 @@ spec:
             # management taking precedence of env vars over config.json
             # currently, minio client will init a static client if access keys and secret
             # are not empty.
+            - $patch: delete
+              name: OBJECTSTORECONFIG_BUCKETNAME
             - $patch: delete
               name: OBJECTSTORECONFIG_ACCESSKEY
             - $patch: delete
