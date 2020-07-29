@@ -13,6 +13,7 @@ data:
             bucket: $(artifactRepositoryBucket),
             keyPrefix: $(artifactRepositoryKeyPrefix),
             endpoint: s3.amazonaws.com,
+            region: ap-southeast-1
             insecure: false
         }
     }
