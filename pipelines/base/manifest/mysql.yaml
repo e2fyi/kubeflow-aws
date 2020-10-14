@@ -21,7 +21,7 @@ spec:
         - name: mysql
           env:
             - name: MYSQL_DATABASES
-              value: "$(DBNAME_PIPELINE),$(DBNAME_MLMD),$(DBNAME_CACHE)"
+              value: "$(pipelineDb),$(mlmdDb),$(cacheDb)"
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -64,7 +64,7 @@ kind: Service
 metadata:
   labels:
     app: mysql
-  name: $(DBSERVICE_HOST)
+  name: $(dbHost)
 spec:
   selector:
     app: mysql
