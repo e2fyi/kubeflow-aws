@@ -27,5 +27,5 @@ varReference:
   kind: StorageClass
 - path: metadata/name
   kind: Service
-- path: spec/ports/port
-  kind: Service
+# - path: spec/ports/port
+#   kind: Service
